@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Template.ConsoleSolution.ConsoleApp.Features.SampleFeature;
 
 namespace Template.ConsoleSolution.ConsoleApp
 {
     internal class Startup
     {
-        public Task StartApplicationAsync()
+        private readonly IMySampleFeature _mySampleFeature;
+
+        public Startup(IMySampleFeature mySampleFeature)
+        {
+            _mySampleFeature = mySampleFeature;
+        }
+
+        public async Task StartApplicationAsync()
         {
             Console.WriteLine("Hello World");
-            return Task.CompletedTask;
+            await _mySampleFeature.DoFeatureWorkAsync();
         }
     }
 }
