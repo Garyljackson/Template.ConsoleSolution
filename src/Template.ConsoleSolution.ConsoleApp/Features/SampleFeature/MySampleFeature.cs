@@ -8,17 +8,20 @@ namespace Template.ConsoleSolution.ConsoleApp.Features.SampleFeature
     internal class MySampleFeature : IMySampleFeature
     {
         private readonly IOptions<SampleSettings> _sampleSettings;
+        private readonly ISampleHttpClient _sampleHttpClient;
 
-        public MySampleFeature(IOptions<SampleSettings> sampleSettings)
+        public MySampleFeature(IOptions<SampleSettings> sampleSettings, ISampleHttpClient sampleHttpClient)
         {
             _sampleSettings = sampleSettings;
+            _sampleHttpClient = sampleHttpClient;
         }
 
-        public Task DoFeatureWorkAsync()
+        public async Task DoFeatureWorkAsync()
         {
             Console.WriteLine($"Setting 1 (appsettings.json): {_sampleSettings.Value.Setting1}");
             Console.WriteLine($"Setting 2 (appsettings.Development.json): {_sampleSettings.Value.Setting2}");
-            return Task.CompletedTask;
+
+            await _sampleHttpClient.DoSomethingWithTheClient();
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 using Template.ConsoleSolution.ConsoleApp.Features.SampleFeature;
 using Template.ConsoleSolution.ConsoleApp.Infrastructure.Settings;
 
@@ -33,6 +35,10 @@ namespace Template.ConsoleSolution.ConsoleApp
             // Services
             services.AddSingleton<Startup>();
             services.AddTransient<IMySampleFeature, MySampleFeature>();
+
+            // Http Clients
+            services.AddHttpClient<ISampleHttpClient, SampleHttpClient>()
+                .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(600)));
         }
     }
 }
