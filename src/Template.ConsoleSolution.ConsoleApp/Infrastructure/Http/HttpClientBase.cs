@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -40,11 +41,7 @@ namespace Template.ConsoleSolution.ConsoleApp.Infrastructure.Http
             await SerializeAsync(requestStream, request);
 
             var requestMessage = CreateRequest(HttpMethod.Put, requestUri, requestStream);
-            var responseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
-
-            // Still undecided about how I should communicate success or failure.
-            // Maybe errors should be handled with a DelegatingHandler, and here I should only focus on the success case..?
-            // Technically a REST based PUT should return Status204NoContent if all goes well..
+            await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
         }
 
         protected async Task<TResponse> DeleteAsync<TRequest, TResponse>(Uri requestUri)
@@ -57,9 +54,12 @@ namespace Template.ConsoleSolution.ConsoleApp.Infrastructure.Http
 
         private static HttpRequestMessage CreateRequest(HttpMethod httpMethod, Uri requestUri, Stream requestStream)
         {
+            var streamContent = new StreamContent(requestStream);
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
             return new HttpRequestMessage(httpMethod, requestUri)
             {
-                Content = new StreamContent(requestStream)
+                Content = streamContent
             };
         }
 
@@ -82,7 +82,7 @@ namespace Template.ConsoleSolution.ConsoleApp.Infrastructure.Http
         private static async Task SerializeAsync<T>(Stream stream, T request)
         {
             await JsonSerializer.SerializeAsync(stream, request, DefaultJsonSerializerOptions.Options);
-            //stream.Position = 0; // Not sure if I need this, need to test
+            stream.Seek(0, SeekOrigin.Begin);
         }
     }
 }

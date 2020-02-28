@@ -33,6 +33,9 @@ namespace Template.ConsoleSolution.ConsoleApp
             // Services
             services.AddSingleton<Startup>();
             services.AddTransient<IMySampleFeature, MySampleFeature>();
+
+            // Http Clients
+            services.AddHttpClient<MySampleHttpClient>();
         }
     }
 }
